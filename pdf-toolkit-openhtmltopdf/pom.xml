@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.calcifux</groupId>
+    <artifactId>pdf-toolkit-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <artifactId>pdf-toolkit-openhtmltopdf</artifactId>
+  <packaging>jar</packaging>
+
+  <name>pdf-toolkit-openhtmltopdf</name>
+  <description>
+    OpenHTMLtoPDF adapter for pdf-toolkit's PdfEngine SPI (PDFBox backend) — the default HTML-to-PDF
+    engine, the one pdf-utils used. Expects well-formed XHTML; resolves relative assets against the
+    spec's baseUri (or use absolute / data: URIs). Honors CSS paged-media (@page, margin boxes).
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.calcifux</groupId>
+      <artifactId>pdf-toolkit-core</artifactId>
+    </dependency>
+
+    <!-- OpenHTMLtoPDF (PDFBox backend) — pulls openhtmltopdf-core + pdfbox transitively. -->
+    <dependency>
+      <groupId>com.openhtmltopdf</groupId>
+      <artifactId>openhtmltopdf-pdfbox</artifactId>
+    </dependency>
+    <!-- Route OpenHTMLtoPDF's logging through slf4j. -->
+    <dependency>
+      <groupId>com.openhtmltopdf</groupId>
+      <artifactId>openhtmltopdf-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.calcifux</groupId>
+  <artifactId>pdf-toolkit-parent</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+
+  <name>pdf-toolkit-parent</name>
+  <description>
+    HTML-to-PDF for Java: write a typed PdfDocument (a template + vars, page size/margins,
+    headers/footers, page numbers) and get bytes. Templating is OPTIONAL and pluggable behind
+    one SPI (Pebble, Thymeleaf, FreeMarker — or skip it and feed final HTML), and the HTML-to-PDF
+    engine is pluggable behind another SPI (OpenHTMLtoPDF by default). A PdfPostProcessor seam
+    handles encrypt/watermark/merge in your app. Mounts as a Spring Boot starter.
+  </description>
+  <url>https://github.com/calcifux/pdf-toolkit</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+
+  <!--
+    NO <parent>. Same call as auth-toolkit / mailable-toolkit / the remote-* libraries: a LIBRARY
+    imports the spring-boot-dependencies BOM (below) for managed versions instead of inheriting
+    spring-boot-starter-parent, so we get Boot's dependency management without its app-oriented
+    build/plugin config.
+  -->
+
+  <properties>
+    <!-- Single source of truth for the release version (resolved by flatten at publish). -->
+    <revision>0.1.0</revision>
+
+    <java.version>21</java.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- Spring Boot BOM — manages spring-*, thymeleaf, freemarker, junit, assertj, slf4j, etc. -->
+    <spring.boot.version>3.2.5</spring.boot.version>
+
+    <lombok.version>1.18.36</lombok.version>
+
+    <!-- Pebble: NOT in the Boot BOM, so pin it. Jinja-like template inheritance. -->
+    <pebble.version>3.2.2</pebble.version>
+
+    <!-- OpenHTMLtoPDF: the default HTML->PDF engine (PDFBox backend). NOT in the Boot BOM, pin it. -->
+    <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
+
+    <!-- Build plugins pinned to versions JitPack's older build Maven accepts
+         (same caps as auth-toolkit / mailable-toolkit / the remote-* libraries). -->
+    <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+    <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
+
+    <!-- Deliberately NO SonarCloud / JaCoCo: this toolkit stays "basic and fast" to build.
+         Tests run in CI/local; JitPack builds with -DskipTests. -->
+  </properties>
+
+  <modules>
+    <module>pdf-toolkit-core</module>
+    <module>pdf-toolkit-pebble</module>
+    <module>pdf-toolkit-thymeleaf</module>
+    <module>pdf-toolkit-freemarker</module>
+    <module>pdf-toolkit-openhtmltopdf</module>
+    <module>pdf-toolkit-spring</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- Spring Boot BOM — versions for thymeleaf, freemarker, spring-*, junit-jupiter,
+           assertj-core, slf4j-api. -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Pebble templating engine (pinned; not in the Boot BOM). -->
+      <dependency>
+        <groupId>io.pebbletemplates</groupId>
+        <artifactId>pebble</artifactId>
+        <version>${pebble.version}</version>
+      </dependency>
+
+      <!-- OpenHTMLtoPDF (pinned; not in the Boot BOM). -->
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-core</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-pdfbox</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-slf4j</artifactId>
+        <version>${openhtmltopdf.version}</version>
+      </dependency>
+
+      <!-- Internal module -->
+      <dependency>
+        <groupId>com.github.calcifux</groupId>
+        <artifactId>pdf-toolkit-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <release>${java.version}</release>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <!-- flatten: resolve ${revision} to a literal at install/deploy so JitPack publishes
+           POMs without the variable. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>${flatten-maven-plugin.version}</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

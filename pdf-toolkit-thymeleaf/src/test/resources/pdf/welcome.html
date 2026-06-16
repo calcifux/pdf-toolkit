@@ -1,0 +1,9 @@
+<!--
+  Welcome page. "Inherits" from pdf/base by replacing itself with the base layout
+  fragment, handing its own ~{::content} fragment as the layout's parameter. The
+  ClassLoaderTemplateResolver loads pdf/base.html the same way it loads this file,
+  so this is the real Thymeleaf layout/inheritance mechanism (parameterized fragments).
+-->
+<div th:replace="~{pdf/base :: layout(~{::content})}">
+    <p th:fragment="content" th:text="'Hi ' + ${name}">Hi placeholder</p>
+</div>
