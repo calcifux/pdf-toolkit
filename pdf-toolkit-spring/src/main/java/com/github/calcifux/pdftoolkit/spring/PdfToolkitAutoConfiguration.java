@@ -41,7 +41,7 @@ public class PdfToolkitAutoConfiguration {
     static class PebbleRendererConfig {
         @Bean
         @ConditionalOnMissingBean(TemplateRenderer.class)
-        TemplateRenderer pebbleTemplateRenderer(PdfToolkitProperties props) {
+        TemplateRenderer pdfToolkitPebbleRenderer(PdfToolkitProperties props) {
             return new PebbleTemplateRenderer(props.getTemplate().getPrefix(), suffixOr(props, ".peb"));
         }
     }
@@ -53,7 +53,7 @@ public class PdfToolkitAutoConfiguration {
     static class ThymeleafRendererConfig {
         @Bean
         @ConditionalOnMissingBean(TemplateRenderer.class)
-        TemplateRenderer thymeleafTemplateRenderer(PdfToolkitProperties props) {
+        TemplateRenderer pdfToolkitThymeleafRenderer(PdfToolkitProperties props) {
             return new ThymeleafTemplateRenderer(props.getTemplate().getPrefix(), suffixOr(props, ".html"));
         }
     }
@@ -65,7 +65,7 @@ public class PdfToolkitAutoConfiguration {
     static class FreemarkerRendererConfig {
         @Bean
         @ConditionalOnMissingBean(TemplateRenderer.class)
-        TemplateRenderer freemarkerTemplateRenderer(PdfToolkitProperties props) {
+        TemplateRenderer pdfToolkitFreemarkerRenderer(PdfToolkitProperties props) {
             return new FreemarkerTemplateRenderer(props.getTemplate().getPrefix(), suffixOr(props, ".ftlh"));
         }
     }
