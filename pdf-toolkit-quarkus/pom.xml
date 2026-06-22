@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+            http://maven.apache.org/POM/4.0.0
+            https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.github.calcifux</groupId>
+    <artifactId>pdf-toolkit-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <artifactId>pdf-toolkit-quarkus</artifactId>
+  <packaging>jar</packaging>
+
+  <name>pdf-toolkit-quarkus</name>
+  <description>
+    Adapter for Quarkus and any compatible CDI + MicroProfile Config runtime (Helidon, OpenLiberty, ...).
+    Provides an injectable @ApplicationScoped PdfCdiService that builds a PdfGenerator from a Pebble
+    TemplateRenderer + the OpenHTMLtoPDF engine (configured by pdf-toolkit.template.engine/prefix/suffix),
+    plus a static, drop-in Pdf facade mirroring pdf-toolkit-spring. Framework-agnostic on top of the
+    pdf-toolkit-core / -pebble / -openhtmltopdf modules. Native-image support is not included in v1.
+  </description>
+
+  <dependencies>
+    <!-- Framework-agnostic toolkit modules (reused unchanged). -->
+    <dependency>
+      <groupId>com.github.calcifux</groupId>
+      <artifactId>pdf-toolkit-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.github.calcifux</groupId>
+      <artifactId>pdf-toolkit-pebble</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.calcifux</groupId>
+      <artifactId>pdf-toolkit-openhtmltopdf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- CDI + MicroProfile Config runtime APIs: provided by Quarkus/Helidon/OpenLiberty at runtime. -->
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.microprofile.config</groupId>
+      <artifactId>microprofile-config-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Emit META-INF/jandex.idx into the jar (process-classes) so Quarkus/Arc auto-discovers this
+           module's @ApplicationScoped beans with no quarkus.index-dependency in the consuming app. -->
+      <plugin>
+        <groupId>io.smallrye</groupId>
+        <artifactId>jandex-maven-plugin</artifactId>
+        <version>${jandex-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>make-index</id>
+            <goals>
+              <goal>jandex</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -38,7 +38,7 @@
 
   <properties>
     <!-- Single source of truth for the release version (resolved by flatten at publish). -->
-    <revision>0.1.1</revision>
+    <revision>0.1.2</revision>
 
     <java.version>21</java.version>
     <maven.compiler.release>21</maven.compiler.release>
@@ -49,6 +49,12 @@
     <spring.boot.version>3.2.5</spring.boot.version>
 
     <lombok.version>1.18.36</lombok.version>
+
+    <!-- Jakarta CDI + MicroProfile Config for the framework-agnostic -quarkus adapter (provided
+         scope; supplied by Quarkus/Helidon/OpenLiberty at runtime). cdi-api + microprofile-config-api
+         are NOT in the Spring Boot BOM, so pin them here (same versions as remote-upload/auth-toolkit). -->
+    <jakarta.cdi.version>4.0.1</jakarta.cdi.version>
+    <microprofile.config.version>3.1</microprofile.config.version>
 
     <!-- Pebble: NOT in the Boot BOM, so pin it. Jinja-like template inheritance. -->
     <pebble.version>3.2.2</pebble.version>
@@ -62,6 +68,12 @@
     <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
     <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
 
+    <!-- Jandex: the -quarkus jar ships META-INF/jandex.idx so a consuming Quarkus app auto-discovers
+         its CDI beans with ZERO config (no quarkus.index-dependency). MUST match the io.smallrye:jandex
+         the TARGET Quarkus bundles (3.20 -> 3.2.7, index format v12): jandex 3.5.x writes v13, which the
+         Quarkus 3.20 reader rejects (UnsupportedVersion). NB: plugin artifact moved org.jboss.jandex -> io.smallrye. -->
+    <jandex-maven-plugin.version>3.2.7</jandex-maven-plugin.version>
+
     <!-- Deliberately NO SonarCloud / JaCoCo: this toolkit stays "basic and fast" to build.
          Tests run in CI/local; JitPack builds with -DskipTests. -->
   </properties>
@@ -73,6 +85,7 @@
     <module>pdf-toolkit-freemarker</module>
     <module>pdf-toolkit-openhtmltopdf</module>
     <module>pdf-toolkit-spring</module>
+    <module>pdf-toolkit-quarkus</module>
   </modules>
 
   <dependencyManagement>
@@ -116,6 +129,18 @@
         <groupId>com.github.calcifux</groupId>
         <artifactId>pdf-toolkit-core</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <!-- Jakarta CDI + MicroProfile Config (for the -quarkus adapter; not managed by the Boot BOM). -->
+      <dependency>
+        <groupId>jakarta.enterprise</groupId>
+        <artifactId>jakarta.enterprise.cdi-api</artifactId>
+        <version>${jakarta.cdi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.microprofile.config</groupId>
+        <artifactId>microprofile-config-api</artifactId>
+        <version>${microprofile.config.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
